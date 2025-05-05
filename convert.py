@@ -28,6 +28,9 @@ for paper in papers:
     for name in author_names:
         standardized.append(standardize_name(name))
     paper['authors'] = standardized
+    # 将"paper_id": "hep-th/9211077" 改为"paper_id": "9211077"
+    if 'paper_id' in paper:
+        paper['paper_id'] = paper['paper_id'].split('/')[-1]
 
 # 保存
 with open('papers_standardized.json', 'w') as f:

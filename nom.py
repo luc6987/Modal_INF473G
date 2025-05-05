@@ -41,7 +41,8 @@ def extract_author(authors):
     authors = re.sub(r'\s+', ' ', authors)  # 去多余空格  
     authors = re.sub(r'\"', '', authors)  # 去掉双引号
     authors = re.sub(r'\'', '', authors)  # 去掉单引号
-    authors = re.sub(r'\(.*?\)', '', authors)  # 去括号内容
+    while '(' in authors and ')' in authors:
+        authors = re.sub(r'\([^()]*\)', '', authors)  # 去括号内容
     authors = re.split(r',| and ', authors)  # 按逗号或"and"分割
     authors = [a.strip() for a in authors if a.strip()]
     authors = [re.sub(r'[^a-zA-Z .]', '', a) for a in authors]  # 只保留拉丁字母
