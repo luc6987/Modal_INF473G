@@ -62,12 +62,12 @@ def parse_abs_file(filepath):
                 if current_key:
                     data[current_key] = (data[current_key] or '') + ' ' + stripped
                 else:
-                 print(f"[未识别行] 文件 {os.path.basename(filepath)}: {stripped}")
+                 print(f"[line inidentified] file {os.path.basename(filepath)}: {stripped}")
         else:
             if current_key:
                 data[current_key] = (data[current_key] or '') + ' ' + stripped
             else:
-                print(f"[未识别行] 文件 {os.path.basename(filepath)}: {stripped}")
+                print(f"[line inidentified] file {os.path.basename(filepath)}: {stripped}")
 
 
     for key in data:
@@ -96,10 +96,10 @@ def process_all_years(base_dir, start_year=1992, end_year=2003):
     for year in range(start_year, end_year + 1):
         year_dir = os.path.join(base_dir, str(year))
         if not os.path.exists(year_dir):
-            print(f"警告：目录 {year_dir} 不存在，跳过。")
+            print(f"warning:document {year_dir} does not exist.")
             continue
 
-        print(f"处理年份 {year} ...")
+        print(f"working on {year} ...")
         for filename in os.listdir(year_dir):
             if filename.endswith('.abs'):
                 filepath = os.path.join(year_dir, filename)
@@ -108,7 +108,7 @@ def process_all_years(base_dir, start_year=1992, end_year=2003):
                     record['year'] = year  
                     all_records.append(record)
                 except Exception as e:
-                    print(f"文件 {filename} 解析失败: {e}")
+                    print(f"file {filename} analyse failed: {e}")
 
     return all_records
 
@@ -121,4 +121,4 @@ results = process_all_years(base_directory)
 with open('output.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 完成：共处理 {len(results)} 个记录，已保存到 output.json。")
+print(f"Finish. In total of {len(results)} records, saved to output.json。")
