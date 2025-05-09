@@ -14,7 +14,7 @@ institution_keywords = [
     'university', 'institute', 'dept', 'department', 'college', 'school',
     'laboratory', 'centre', 'cnrs', 'universität', 'universita', 'faculté',
     'academy', 'group', 'team', 'laboratoire', 'division', 'instituto', 'institut',
-    'cern', 'mit', 'caltech', 'lptens', 'slac', 'infn', 'inaf'
+    'cern', 'mit', 'caltech', 'lptens', 'slac', 'infn', 'inaf','centro'
     # 国家
     # countries
     'usa', 'united states', 'canada', 'china', 'france', 'germany', 'uk', 'united kingdom',
