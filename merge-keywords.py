@@ -9,8 +9,8 @@ import gc
 
 
 # ======== 加载数据 ==========
-with open("keywords_extracted.json", "r") as f:
-    data = json.load(f)
+with open("keywords_extracted.jsonl", "r") as f:
+    data = [json.loads(line) for line in f]
 
 # ======== 提取所有关键词短语 ==========
 all_keywords = set()
@@ -18,6 +18,16 @@ for paper in data:
     all_keywords.update(paper["keywords"])
 all_keywords = sorted(all_keywords)
 
+#========= 预处理 ==========
+
+# 1. 去除连字符“ - ”两边的空格
+all_keywords = [kw.replace(" - ", "-") for kw in all_keywords]
+# 2. 去除“title:”前缀
+all_keywords = [kw.replace("title:", "") for kw in all_keywords]
+# 3. 去除“abstract:”前缀
+all_keywords = [kw.replace("abstract:", "") for kw in all_keywords]
+# 4. 去除“$”符号
+all_keywords = [kw.replace("$", "") for kw in all_keywords]
 
 
 # ======== 编码关键词短语 ==========
@@ -55,7 +65,7 @@ for kw, label in zip(all_keywords, labels):
 merge_dict = {}
 for group in clusters.values():
     sorted_group = sorted(group)
-    rep = min(sorted_group, key=len)
+    rep = sorted_group[0]  # 代表词
     for var in sorted_group:
         merge_dict[var] = rep
 
