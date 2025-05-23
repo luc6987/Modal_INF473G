@@ -6,7 +6,6 @@ def parse_abs_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
 
-   
     #delete the first two lines and the last line
     lines = content.splitlines()
     if len(lines) > 3:
