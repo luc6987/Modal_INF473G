@@ -15,7 +15,7 @@
 \tcbuselibrary{listingsutf8}
 
 
-\title{Project CURA: Author Collaboration Network from Physics Papers}
+\title{}
 \author{Yuguang YAO and Duc Khoi LE  \textit{\small Ecole Polytechnique}}
 \date{May 2025}
 
@@ -24,7 +24,14 @@
 \maketitle
 
 \begin{abstract}
-In this report, we present Project CURA, a data mining project analyzing the collaboration patterns among authors of physics papers. We develop a complete pipeline from metadata extraction to graph construction and community detection. This report details the dataset processing, graph construction using co-authorship information, and preliminary insights from community detection, with prospects for influence and citation-based analysis.
+This project focuses on the analysis of scientific papers in the field of high-energy theoretical physics, based on metadata and abstracts from the hep-th (High Energy Physics - Theory) category on arXiv. The dataset spans papers submitted between 1992 and 2003. The main objectives are:
+\begin{itemize}
+\item To analyze the evolution of research topics and trends within the field;
+\item To build a semantic graph of papers using natural language processing techniques (e.g., keyword extraction and sentence embeddings);
+\item To apply graph theory algorithms to identify key papers, domain clusters, and citation flows;
+\item To visualize the results interactively, offering researchers an intuitive understanding of the field’s structure.
+\end{itemize}
+The document covers dataset description, preprocessing steps, keyword extraction methods (such as BertKey), graph construction and clustering algorithms (e.g., HDBSCAN), and visualization tools (such as ipysigma). It also includes illustrative figures and technical implementation details.
 \end{abstract}
 
 \tableofcontents
@@ -32,16 +39,17 @@ In this report, we present Project CURA, a data mining project analyzing the col
 \newpage
 
 \section{Introduction}
-In the progress of science, the paper lies to the heart of it. In this report, we will present our analyse to the code using the tools from computers. 
 
-Such networks not only illustrate collaboration dynamics but also help answer deeper questions:
-\begin{itemize}
-\item Which authors are most central in the network?
-\item How do communities reflect sub-disciplines or institutional affiliations?
-\item How has the structure of collaborations evolved over time?
-\end{itemize}
+Scientific collaboration has become increasingly data-rich, with large-scale metadata repositories like arXiv offering valuable insights into the dynamics of academic production. This project seeks to investigate the structure of high-energy theoretical physics through the lens of co-authorship, citation, and keyword-based clustering. We analyze papers submitted between 1992 and 2003 in the \texttt{hep-th} category on arXiv, using graph-theoretic and NLP-based methods.
 
-This document outlines each step of our project, from data preprocessing to network analysis.
+While the objectives are ambitious and the methodological diversity is commendable, several foundational aspects of the project warrant critical scrutiny. First, the document lacks a clear articulation of the central research question. It proceeds with multiple computational steps—graph construction, clustering, citation trees—without clarifying what specific patterns or hypotheses are being tested. This risks turning the work into a purely descriptive effort, rather than a scientifically driven inquiry.
+
+Second, although the dataset spans more than a decade, there is limited reflection on the limitations or biases inherent in the corpus (e.g., language uniformity, geographic skew, or disciplinary overlap with adjacent subfields). Moreover, while advanced tools such as BERT-based keyword extraction and Louvain community detection are employed, the project would benefit from a justification of why these specific techniques were chosen over alternatives. For instance, no performance evaluation or comparative benchmark is given for the keyword extraction method.
+
+Finally, the introduction makes no mention of how the results are intended to inform or benefit the broader research community. What concrete insight is expected for physicists, historians of science, or bibliometricians? Without such context, the work risks being technically impressive but epistemically opaque.
+
+In this report, we attempt to address these gaps where possible, and structure our analysis across data description, graph construction, community detection, semantic clustering, and citation flow modeling. Throughout, we adopt a critical perspective, evaluating not only the results but also the assumptions, limitations, and future directions that accompany each stage.
+
 
 \section{Dataset Description and Motivation}
 
@@ -551,97 +559,80 @@ Additionally, the script \texttt{merge-keywords.py} is used to combine and stand
 
 To ensure consistency, entries without matching keywords are either discarded or kept without the keyword field, depending on configuration. This integrated dataset serves as the input for downstream clustering, visualization, and analysis tasks.
 
+\section{Visualisation et Analyse du Réseau de Citations de la Physique Théorique}
 
-\section{Preliminary Results and Visualizations}
+Ce notebook a pour objectif de construire et visualiser un graphe de citations entre des articles scientifiques issus du domaine de la physique théorique à partir du corpus ArXiv (catégorie High Energy Physics - Theory, ``Cit-HepTh''). Il combine traitement de texte, nettoyage sémantique, clustering non supervisé, et visualisation temporelle.
 
-In this section, we present key insights derived from our constructed graphs, along with visual representations that help highlight structural features, influential entities, and overarching patterns within the High Energy Physics community.
+\subsection{Prétraitement des mots-clés}
 
-\subsection{Collaboration Graph Overview}
-The collaboration network contains approximately 9,800 unique authors and over 50,000 co-authorship links, as derived from the \texttt{CA-HepTh.txt} dataset. Visualization of this graph reveals:
-
+Deux fichiers sont d'abord intégrés :
 \begin{itemize}
-    \item A giant connected component encompassing the majority of authors.
-    \item Dense local clusters corresponding to research groups or institutions.
-    \item A heavy-tailed degree distribution, where a small number of authors are connected to a disproportionately large number of collaborators.
+    \item \texttt{keywords\_extracted.jsonl} : chaque ligne contient les mots-clés extraits automatiquement d'un article donné.
+    \item \texttt{keyword\_clusters.json} : il contient des regroupements de synonymes (par exemple, ``vortex filament'' et ``vortex gas'' sont normalisés en ``vortex cells'').
+\end{itemize}
+
+Un script de nettoyage applique cette normalisation pour chaque mot-clé, produisant un dictionnaire final \texttt{keywords\_cleaned.json} qui associe à chaque article un ensemble de mots-clés uniques et normalisés.
+
+\subsection{Construction du graphe de citations}
+
+À partir du fichier brut \texttt{Cit-HepTh.txt}, un graphe orienté est construit via la librairie \texttt{networkx}. Chaque nœud représente un article, et chaque arête représente une relation de citation. Les métadonnées (titre, mots-clés nettoyés) sont intégrées aux nœuds.
+
+\subsection{Détection de communautés et classification thématique}
+
+Deux stratégies complémentaires sont utilisées :
+\begin{itemize}
+    \item Détection de communautés via l'algorithme de Louvain, révélant des sous-structures denses dans le graphe.
+    \item Classification thématique supervisée par clustering KMeans sur les représentations TF-IDF des mots-clés, assignant un domaine scientifique à chaque article. Chaque domaine reçoit une couleur distincte.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{pictures/top_author_name_variants.png}
-    \caption{Visualization of the full collaboration graph. Nodes represent authors; edge weights represent number of co-authored papers.}
+    \includegraphics[width=0.95\textwidth]{pictures/graph.png}
+    \caption{Visualisation globale du graphe des citations, où la taille des nœuds reflète leur centralité d’intermédiarité (betweenness centrality).}
 \end{figure}
 
-\subsection{Community Layout}
-Applying the Louvain algorithm for community detection yields a modular structure with clear segmentation. Visual layouts, colored by detected communities, show:
+\subsection{Projection temporelle et positionnement}
 
+Les articles sont positionnés dans l'espace en deux dimensions :
 \begin{itemize}
-    \item Strong intra-community linkage (high modularity).
-    \item Inter-community "bridge" nodes that facilitate interdisciplinary work.
+    \item Axe horizontal : domaines scientifiques (issus du clustering KMeans sur les mots-clés);
+    \item Axe vertical : date de soumission de l’article (extrait de l’identifiant ArXiv).
 \end{itemize}
+
+Des offsets latéraux sont ajoutés pour éviter le chevauchement. La taille des nœuds reflète leur degré (nombre de citations reçues ou faites).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{pictures/top_author_name_variants.png}
-    \caption{Louvain community detection applied to the collaboration network. Each color represents a different detected community.}
+    \includegraphics[width=0.95\textwidth]{pictures/domain.png}
+    \caption{Projection temporelle et thématique des articles. Chaque colonne correspond à un domaine scientifique identifié automatiquement, les couleurs représentant les communautés détectées.}
 \end{figure}
 
-\subsection{Citation Graph Highlights}
-In the citation graph (from \texttt{Cit-HepTh.txt}), we extracted directional edges where a paper cites another. Basic statistics include:
+\subsection{Exploration temporelle structurée des trajectoires de citations}
 
+Une fois les articles classés et placés dans l’espace, une analyse plus fine est réalisée sur les \textbf{10 articles les plus centraux}, mesurés par leur \textit{betweenness centrality}.
+
+Pour chacun de ces articles, on construit deux sous-arbres temporels :
 \begin{itemize}
-    \item Over 27,000 nodes (papers) and more than 350,000 citation links.
-    \item Presence of highly cited "hub" papers.
-    \item Time-aware clustering of citations showing topical shifts over the years.
+    \item Un arbre descendant (\textit{forward direction}) : les articles que cet article cite, avec propagation récursive vers leurs propres citations.
+    \item Un arbre ascendant (\textit{backward direction}) : les articles qui citent cet article, avec propagation récursive vers leurs propres référents.
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{pictures/top_author_name_variants.png}
-    \caption{Distribution of incoming citations (in-degree) across papers. A long-tail pattern is evident, with a small number of papers attracting a large fraction of citations.}
-\end{figure}
+Chaque nœud dans ces sous-arbres est une \textbf{copie} d’un article original, étiqueté par son origine (par ex. \texttt{9211012\_from\_9802150}) pour éviter les conflits d’identifiants et garantir un graphe acyclique. La profondeur temporelle est limitée à une fenêtre de $N=120$ mois pour éviter les branches trop longues.
 
-\subsection{Centrality Maps}
-We computed and visualized centrality scores for both collaboration and citation networks. These visualizations help in identifying central nodes by their size or color intensity:
+La position verticale des nœuds dans l’arbre est centrée autour de la date du nœud racine (les $10$ top articles), permettant une visualisation comparative claire entre branches ascendantes et descendantes. L’arborescence complète est ainsi structurée par origine thématique et temporelle.
 
 \begin{itemize}
-    \item Degree and eigenvector centralities help pinpoint core authors in the collaboration network.
-    \item PageRank identifies impactful papers in the citation network.
+    \item Les arêtes sont orientées (ascendantes ou descendantes).
+    \item La taille des nœuds est proportionnelle à leur importance locale (degré).
+    \item Les couleurs reflètent les domaines thématiques (KMeans).
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{pictures/top_author_name_variants.png}
-    \caption{Collaboration graph visualized by node degree. Larger, redder nodes represent highly connected authors.}
-\end{figure}
-
-\subsection{Temporal Visualization}
-Using timestamped data from \texttt{Cit-HepTh-dates.txt}, we animated the yearly growth of the network. Temporal plots include:
-
+Cette approche permet de visualiser des dynamiques telles que :
 \begin{itemize}
-    \item Yearly author count growth
-    \item Annual number of new collaborations
-    \item Citation timelines per paper
+    \item L'impact durable d’un article dans un champ ;
+    \item Les échos successifs d’un article dans la littérature scientifique ;
+    \item L’évolution thématique d’une lignée de travaux.
 \end{itemize}
-
-These animations and time-series plots offer a dynamic view of scientific development and knowledge diffusion.
-
-\subsection{Case-Based Subgraphs}
-To further understand local structure, we extracted ego graphs centered around key authors (e.g., Edward Witten, Juan Maldacena). These show:
-
-\begin{itemize}
-    \item Witten’s neighborhood spans multiple communities and decades of collaboration.
-    \item Maldacena’s citation ego graph reveals his paper’s influence across various theoretical frameworks.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{pictures/top_author_name_variants.png}
-    \caption{Ego graph for Edward Witten: direct co-authorships and second-order neighbors.}
-\end{figure}
-
-\subsection{Summary}
-The visual exploration of both networks validates the structural, temporal, and centrality-based findings discussed in earlier sections. These figures provide intuitive and compelling representations of complex data and form a strong complement to quantitative analysis.
-
 
 \section{Future Work}
 \begin{itemize}
@@ -664,6 +655,13 @@ Project CURA demonstrates the value of graph-based data mining in understanding 
 \item matplotlib, seaborn
 \item community (Louvain)
 \item pandas, numpy
+\item BertKey (HuggingFace Transformers)
+\item scikit-learn (KMeans)
+\item PyTorch (for BertKey)
+\item regex (for text processing)
+\item json (for data serialization)
+\item tqdm (for progress bars)
+\item nltk (for text normalization)
 \end{itemize}
 
 \subsection*{B. Scripts and Notebooks}
@@ -673,25 +671,12 @@ Project CURA demonstrates the value of graph-based data mining in understanding 
 \item \texttt{nom.py} - author name preprocessing
 \item \texttt{standarniee\_name.py} - alias mapping
 \item \texttt{physics.ipynb} - analysis and plotting
+\item \texttt{mot.py} - keyword extraction with BertKey
+\item \texttt{merge-keywords.py} - keyword normalization
+\item \texttt{graph\_visualization.ipynb} - interactive graph exploration
+\item \texttt{graph\_citation.ipynb} - citation graph analysis
 \end{itemize}
 
-\subsection*{C. Full Metric Table}
-\begin{center}
-    \begin{tabular}{|l|r|}
-    \hline
-    \textbf{Metric} & \textbf{Value} \\
-    \hline
-    Total authors & 9,877 \\
-    Total collaborations & 51,971 \\
-    Total communities & 94 \\
-    Average degree & 10.52 \\
-    Largest community & 623 nodes \\
-    Average modularity & 0.76 \\
-    Total papers (citation graph) & 27,770 \\
-    Total citations & 352,807 \\
-    \hline
-    \end{tabular}
-\end{center}
 
 \end{document}
 

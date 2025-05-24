@@ -2,6 +2,19 @@ import os
 import re
 import json
 
+"""
+This script extracts relevant information from the abstract files of scientific papers.
+
+input:the raw abstract files in the format of .abs, which are stored in the directory assets/cit-HepTh-abstracts.
+output: a JSON file containing the extracted information, including paper ID, authors, title, abstract, and other metadata.
+The script processes each abstract file, extracts the relevant fields, and saves them in a structured format.
+
+the script does the following:
+1. Reads each .abs file in the specified directory.
+2. Parses the content to extract fields like paper ID, authors, title, abstract, and other metadata.
+3. Cleans and formats the extracted data.
+"""
+
 def parse_abs_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()

@@ -2,6 +2,21 @@ import pandas as pd
 import re
 import json
 
+""""
+The input of this script is temp/authors.csv, which contains a column named 'authors'.
+The output is two files:
+1. temp/authors_standardized.csv: This file contains the original author names and their standardized versions.
+2. temp/author_variants.json: This file contains a mapping of standardized author names to their variants.
+The script processes author names to standardize them, merging variants into a single representative name.
+
+the script does the following:
+1. Parses author names to extract first names and last names.
+2. Generates all possible name variants based on initials, full names, and suffixes.
+3. Uses a Union-Find data structure to group names that are variants of each other.
+4. Creates a mapping from normalized names to standardized names.
+# -*- coding: utf-8 -*- 
+"""
+
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
 
 #############################################

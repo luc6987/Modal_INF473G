@@ -7,6 +7,20 @@ import numpy as np
 import hdbscan
 import gc
 
+"""
+this script is to merge similar keywords extracted from scientific papers.
+Input: a JSONL file with each line containing a paper's ID, title, and keywords.
+Output: a JSON file with merged keywords, and a JSON file with clusters of synonyms.
+
+The alogorithm works as follows:
+1. Load the keywords from the JSONL file.
+2. Preprocess the keywords to remove unnecessary prefixes and symbols.
+3. Encode the keywords using a SentenceTransformer model.
+4. Reduce the dimensionality of the embeddings using PCA.
+5. Cluster the reduced embeddings using HDBSCAN.
+6. Create a mapping of keywords to their representative terms based on clustering.
+"""
+
 
 # ======== loading data ==========
 with open("temp/keywords_extracted.jsonl", "r") as f:
@@ -57,14 +71,14 @@ labels = clusterer.fit_predict(reduced_embeddings)
 clusters = defaultdict(list)
 for kw, label in zip(all_keywords, labels):
     if label == -1:
-        clusters[kw].append(kw)  # 独立关键词自己归类
+        clusters[kw].append(kw)  # for noise points, keep them as their own cluster
     else:
         clusters[label].append(kw)
 
 merge_dict = {}
 for group in clusters.values():
     sorted_group = sorted(group)
-    rep = sorted_group[0]  # 代表词
+    rep = sorted_group[0]  # representative term
     for var in sorted_group:
         merge_dict[var] = rep
 
@@ -93,11 +107,11 @@ reverse_merge_dict = defaultdict(list)
 for variant, rep in merge_dict.items():
     reverse_merge_dict[rep].append(variant)
 
-# 按代表词排序，组内排序
+# ordering the synonyms in each cluster
 cluster_dict = {
     rep: sorted(variants)
     for rep, variants in sorted(reverse_merge_dict.items())
-    if len(variants) > 1  # 只显示发生了合并的
+    if len(variants) > 1  # only keep clusters with more than one variant
 }
 
 # saving the clusters to a JSON file

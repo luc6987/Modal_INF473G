@@ -1,6 +1,19 @@
-# 从output.json读authors字段 生成 authors.csv
-# read authors field from output.json and generate authors.csv
-# example "O. Aharony, O. Ganor , N. Sochen J. Sonnenschein and S. Yankielowicz"
+
+"""
+read authors field from output.json and generate authors.csv
+input "O. Aharony, O. Ganor , N. Sochen J. Sonnenschein and S. Yankielowicz"
+output "Aharony O, Ganor O, Sochen N, Sonnenschein J, Yankielowicz S"
+
+there are some rules:
+1. Remove all institution names and their following content.
+2. Remove all email addresses.
+3. Remove all single quotes and double quotes.
+4. Remove all parentheses and their content.
+#         if re.match(r'^[A-Z]{2,}$', part):
+5. Remove all non-Latin characters.
+# 6. Capitalize the first letter of each name.
+
+"""
 
 
 import os

@@ -1,6 +1,19 @@
 import json
 from nom import extract_author  
 
+"""
+This script standardizes author names in scientific papers by mapping variants to a standard name.
+input: a JSON file containing papers with author names.
+output: a new JSON file with standardized author names and cleaned paper IDs.
+
+The script does the following:
+1. Loads author variants from a JSON file.
+2. Maps author name variants to their standard names.
+3. Reads the original JSON file containing papers.
+4. Extracts author names using the `extract_author` function from `nom.py`.
+5. Standardizes the extracted names using the mapping.
+"""
+
 # 加载变体
 # load author variants from JSON file
 with open('author_variants.json', 'r') as f:
