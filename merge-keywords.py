@@ -8,53 +8,52 @@ import hdbscan
 import gc
 
 
-# ======== 加载数据 ==========
-with open("keywords_extracted.jsonl", "r") as f:
+# ======== loading data ==========
+with open("temp/keywords_extracted.jsonl", "r") as f:
     data = [json.loads(line) for line in f]
 
-# ======== 提取所有关键词短语 ==========
+# ======== extracting all keyword phrases ==========
 all_keywords = set()
 for paper in data:
     all_keywords.update(paper["keywords"])
 all_keywords = sorted(all_keywords)
 
-#========= 预处理 ==========
+#========= preprocessing ==========
 
-# 1. 去除连字符“ - ”两边的空格
+# delete the spaces around hyphens
 all_keywords = [kw.replace(" - ", "-") for kw in all_keywords]
-# 2. 去除“title:”前缀
+# delete the title as prefix
 all_keywords = [kw.replace("title:", "") for kw in all_keywords]
-# 3. 去除“abstract:”前缀
+# 3. delete the "abstract:" prefix
 all_keywords = [kw.replace("abstract:", "") for kw in all_keywords]
-# 4. 去除“$”符号
+# 4. delete the "$" symbol
 all_keywords = [kw.replace("$", "") for kw in all_keywords]
 
 
-# ======== 编码关键词短语 ==========
+# ======== encoding keyword phrases ==========
 model = SentenceTransformer("all-MiniLM-L6-v2")
 embeddings = model.encode(all_keywords, show_progress_bar=True)
 
 
 
-# ======== 释放模型减少内存 ==========
+# ======== releasing model memory ==========
 del model
 gc.collect()
 
-# ======== 降维处理 ==========
+# ======== dimensionality reduction ==========
 
 pca = PCA(n_components=50)
 reduced_embeddings = pca.fit_transform(embeddings.astype(np.float32))
 
 
 
-# ======== 聚类合并相似关键词 ==========
-
+# ======== clustering similar keywords ==========
 clusterer = hdbscan.HDBSCAN(min_cluster_size=3)
 labels = clusterer.fit_predict(reduced_embeddings)
 
 
 
-# ======== 构建关键词合并映射 ==========
+# ======== constructing keyword merge mapping ==========
 clusters = defaultdict(list)
 for kw, label in zip(all_keywords, labels):
     if label == -1:
@@ -69,9 +68,9 @@ for group in clusters.values():
     for var in sorted_group:
         merge_dict[var] = rep
 
-# ======== 替换每篇文章中的关键词 ==========
+# ======== replacing keywords in each paper ==========
 result = []
-for paper in tqdm(data, desc="🧹 替换合并关键词"):
+for paper in tqdm(data, desc="Replacing keywords"):
     new_keywords = [merge_dict.get(kw, kw) for kw in paper["keywords"]]
     deduped = sorted(set(new_keywords))
     result.append({
@@ -80,14 +79,14 @@ for paper in tqdm(data, desc="🧹 替换合并关键词"):
         "keywords": deduped
     })
 
-# ======== 保存文件 ==========
-output_path = "./keywords_merged.json"
+# ======== saving file ==========
+output_path = "./temp/keywords_merged.json"
 with open(output_path, "w") as f:
     json.dump(result, f, indent=2)
 
 
 
-# ======== 反向映射：代表词 ➝ 同义词列表 ==========
+# ======== reverse mapping: representative term ➝ synonym list ==========
 from collections import defaultdict
 
 reverse_merge_dict = defaultdict(list)
@@ -101,8 +100,8 @@ cluster_dict = {
     if len(variants) > 1  # 只显示发生了合并的
 }
 
-# 保存为 JSON 文件
-with open("keyword_clusters.json", "w") as f:
+# saving the clusters to a JSON file
+with open("temp/keyword_clusters.json", "w") as f:
     json.dump(cluster_dict, f, indent=4, ensure_ascii=False)
 
 

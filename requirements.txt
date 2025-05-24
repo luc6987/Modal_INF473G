@@ -1,19 +1,23 @@
 # 基础依赖
 numpy
 pandas
-
-# BERT 向量生成
-sentence-transformers>=2.2.2
-
-# 关键词提取核心工具
-keybert>=0.7.0
-
-# 可选：如果你要可视化或调试
 matplotlib
+seaborn
+tqdm
+networkx
 scikit-learn
-
-# 可选：如果你在使用 GPU + CUDA
-torch>=2.0.0  # 自动安装时选择 cu118 / cu121 版本
-
-# 可选：远程 JSON 下载（如果你从 API 获取文章）
 requests
+
+# BERT 与嵌入生成
+sentence-transformers>=2.2.2
+keybert>=0.7.0
+keyphrase-vectorizers>=0.0.11  # 包含 KeyphraseCountVectorizer
+
+# 高级聚类
+hdbscan
+
+# 可视化（Jupyter 支持）
+ipysigma
+
+# 可选：GPU 加速版本（根据平台选择安装）
+torch>=2.0.0  # 如果使用 GPU，建议安装带 CUDA 的版本，如 torch==2.0.0+cu118

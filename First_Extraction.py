@@ -112,12 +112,12 @@ def process_all_years(base_dir, start_year=1992, end_year=2003):
     return all_records
 
 
-base_directory = 'cit-HepTh-abstracts' 
+base_directory = 'assets/cit-HepTh-abstracts' 
 
 results = process_all_years(base_directory)
 
 
-with open('output.json', 'w', encoding='utf-8') as f:
+with open('temp/output.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-print(f"Finish. In total of {len(results)} records, saved to output.json。")
+print(f"Finish. In total of {len(results)} records, saved to temp/output.json。")

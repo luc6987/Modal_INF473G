@@ -18,11 +18,11 @@ kw_model = KeyBERT(model)
 vectorizer = KeyphraseCountVectorizer()
 
 # 加载论文数据
-with open("papers_standardized.json") as f:
+with open("temp/papers_standardized.json") as f:
     data = json.load(f)
 
 # 结果文件路径
-output_path = "keywords_extracted.jsonl"
+output_path = "temp/keywords_extracted.jsonl"
 
 # 如果文件存在，收集已处理的 paper_id
 processed_ids = set()

@@ -179,7 +179,7 @@ class UnionFind:
 # read data
 #############################################
 
-df = pd.read_csv('authors.csv')
+df = pd.read_csv('temp/authors.csv')
 
 # 清洗，确保所有名字是字符串
 # Clean and ensure all names are strings
@@ -238,8 +238,8 @@ df['standard_author'] = df['author_clean'].apply(replace_with_standard)
 # Export CSV
 #############################################
 
-df[['authors', 'standard_author']].to_csv('authors_standardized.csv', index=False, encoding='utf-8')
-print(" all authors standardized and saved to authors_standardized.csv")
+df[['authors', 'standard_author']].to_csv('temp/authors_standardized.csv', index=False, encoding='utf-8')
+print(" all authors standardized and saved to temp/authors_standardized.csv")
 #############################################
 # 导出 JSON
 # Export JSON
@@ -250,7 +250,7 @@ for group_names in groups.values():
     standard_name = max(group_names, key=lambda n: len(n))
     author_variants[standard_name] = sorted(group_names)
 
-with open('author_variants.json', 'w', encoding='utf-8') as f:
+with open('temp/author_variants.json', 'w', encoding='utf-8') as f:
     json.dump(author_variants, f, ensure_ascii=False, indent=4)
 
 print("exported author_variants.json")

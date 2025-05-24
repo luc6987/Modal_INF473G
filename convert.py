@@ -20,7 +20,7 @@ def standardize_name(name):
 
 # 读取原始 JSON（你之前从 .abs 提取的）
 # Read the original JSON file (extracted from .abs files)
-with open('output.json', 'r') as f:
+with open('temp/output.json', 'r') as f:
     papers = json.load(f)
 
 for paper in papers:
@@ -39,7 +39,7 @@ for paper in papers:
 
 # 保存
 # Save the standardized papers to a new JSON file
-with open('papers_standardized.json', 'w') as f:
+with open('temp/papers_standardized.json', 'w') as f:
     json.dump(papers, f, indent=2)
 
-print("完成：所有 authors 已标准化")
+print("Standardized author names and saved to temp/papers_standardized.json")

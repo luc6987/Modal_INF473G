@@ -89,7 +89,7 @@ def process_abstracts(path):
     
     # 读取output.json文件中的authors字段
     # Read the authors field from output.json
-    with open("output.json", "r", encoding="utf-8") as json_file:
+    with open("temp/output.json", "r", encoding="utf-8") as json_file:
         data = json.load(json_file) 
         for item in data:
             authors = item.get("authors", "")
@@ -103,14 +103,14 @@ def process_abstracts(path):
 
     # 将结果保存到authors.csv文件中
     # Save the results to authors.csv
-    with open("authors.csv", "w", encoding="utf-8", newline='') as csv_file:
+    with open("temp/authors.csv", "w", encoding="utf-8", newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["authors"])
         for author in authors_set:
             writer.writerow([author])
-    
-    print("Extraction completed. Data saved to arxiv_data.json and authors.csv")
+
+    print("Extraction completed. Data saved to temp/output.json and temp/authors.csv")
 
 # 示例调用
 # Example call
-process_abstracts("./output.json")
+process_abstracts("temp/output.json")
